@@ -112,6 +112,19 @@ void loop()
       digitalWrite(WATERPUMP, HIGH);
     }
   }
+  if (currentMillis - waterLevelCheckPreviousMillis >= waterLevelCheckInterval)
+  {
+   if (bthc05.available() > 0) {
+    char receivedChar = bthc05.read(); // Read incoming character
+    if (receivedChar == 'v') {
+      int sensorValue = analogRead(WATERLEVELSENSOR_5V_PIN_SIG); // Read sensor value
+      float waterLevelPercent = map(sensorValue, 0, 1023, 0, 100); // Map sensor value to percentage (assuming sensor range is 0-1023)
+
+      // Send water level percentage over Bluetooth
+      bthc05.write((byte*)&waterLevelPercent, sizeof(waterLevelPercent));
+    }
+  }
+}
 }
 
 void executeCommand(char command)
