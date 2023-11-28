@@ -8,15 +8,16 @@
 #include "Pump.h"
 #include <AFMotor.h>
 
+
 // Pin Definitions
 #define BTHC05_PIN_TXD 3
 #define BTHC05_PIN_RXD 10
-#define DCMOTORDRIVERL298_PIN_INT1 2
-#define DCMOTORDRIVERL298_PIN_ENB 6
-#define DCMOTORDRIVERL298_PIN_INT2 4
-#define DCMOTORDRIVERL298_PIN_ENA 5
-#define DCMOTORDRIVERL298_PIN_INT3 7
-#define DCMOTORDRIVERL298_PIN_INT4 8
+#define INT1 2
+#define ENB 6
+#define INT2 4
+#define ENA 5
+#define INT3 7
+#define INT4 8
 #define DCMOTOR_PIN_COIL1 9
 #define HCSR04_PIN_TRIG 13
 #define HCSR04_PIN_ECHO 12
@@ -24,6 +25,7 @@
 #define WATERPUMP_PIN_COIL1 11
 #define WATERLEVELSENSOR_5V_PIN_SIG A3
 #define WATERPUMP 11
+
 AF_DCMotor motor1(1);
 AF_DCMotor motor2(2);
 
@@ -37,7 +39,7 @@ const unsigned long waterLevelCheckInterval = 1000; // Adjust as needed
 
 // Global variables and defines
 BTHC05 bthc05(BTHC05_PIN_RXD, BTHC05_PIN_TXD);
-DCMDriverL298 dcMotorDriverL298(DCMOTORDRIVERL298_PIN_ENA, DCMOTORDRIVERL298_PIN_INT1, DCMOTORDRIVERL298_PIN_INT2, DCMOTORDRIVERL298_PIN_ENB, DCMOTORDRIVERL298_PIN_INT3, DCMOTORDRIVERL298_PIN_INT4);
+DCMDriverL298 dcMotorDriverL298(ENA,INT1,INT2,ENB,INT3,INT4);
 DCMotor dcMotor(DCMOTOR_PIN_COIL1);
 NewPing hcsr04(HCSR04_PIN_TRIG, HCSR04_PIN_ECHO);
 Servo servo9g;
@@ -49,6 +51,8 @@ void setup()
 {
   motor1.setSpeed(255);
   motor2.setSpeed(255);
+  analogWrite(ENA, 200);
+  analogWrite(ENB, 200);
   motor1.run(RELEASE);
   motor2.run(RELEASE);
   pinMode(WATERPUMP, OUTPUT);
@@ -132,27 +136,33 @@ void executeCommand(char command)
   // Motor control logic
   if (command == 'F')
   {
-    motor1.run(FORWARD);
-    motor2.run(FORWARD);
+    digitalWrite(INT1, HIGH);
+    digitalWrite(INT2, LOW);
   }
   else if (command == 'B')
   {
-    motor1.run(BACKWARD);
-    motor2.run(BACKWARD);
+    digitalWrite(INT1, LOW);
+    digitalWrite(INT1, HIGH);
   }
   else if (command == 'L')
   {
-    motor1.run(BACKWARD);
-    motor2.run(FORWARD);
+    digitalWrite(INT1, LOW);
+    digitalWrite(INT2, LOW);
+    digitalWrite(INT3, HIGH);
+    digitalWrite(INT4, LOW);
   }
   else if (command == 'R')
   {
-    motor1.run(FORWARD);
-    motor2.run(BACKWARD);
+    digitalWrite(INT1, HIGH);
+    digitalWrite(INT2, LOW);
+    digitalWrite(INT3, LOW);
+    digitalWrite(INT4, LOW);
   }
   else if (command == 'S')
   {
-    motor1.run(RELEASE);
-    motor2.run(RELEASE);
+    digitalWrite(INT1, LOW);
+    digitalWrite(INT2, LOW);
+    digitalWrite(INT3, LOW);
+    digitalWrite(INT4, LOW);
   }
 }
